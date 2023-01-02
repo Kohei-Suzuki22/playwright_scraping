@@ -1,0 +1,13 @@
+{
+  "name": "playwright_scraping",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Kohei-Suzuki22/playwright_scraping.git",
+  "author": "kohei <bhkbb0551@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "playwright": "^1.29.1",
+    "prettier": "^2.8.1"
+  }
+}
