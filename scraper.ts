@@ -1,5 +1,6 @@
 const playwright = require('playwright')
 const random_useragent = require('random-useragent')
+const fs = require('fs')
 
 const BASE_URL = 'https://github.com/topics/playwright'
 
@@ -12,11 +13,10 @@ const BASE_URL = 'https://github.com/topics/playwright'
    * https://webtan.impress.co.jp/g/%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88
    * */
   const agent = random_useragent.getRandom()
-  console.log('agent', agent)
 
   // ブラウザのセットアップ
 
-  const browser = await playwright.chromium.launch({ headless: false })
+  const browser = await playwright.chromium.launch({ headless: true })
 
   /**
    * { bypassCSP: true } : CSPを無効にする。
@@ -29,11 +29,30 @@ const BASE_URL = 'https://github.com/topics/playwright'
    * https://developer.mozilla.org/ja/docs/Web/HTTP/CSP
    */
 
-  const context = await browser.newContext({ bypassCSP: true ,userAgent: agent})
+  const context = await browser.newContext({
+    bypassCSP: true,
+    userAgent: agent,
+  })
   const page = await context.newPage()
   await page.setDefaultTimeout(30000)
   await page.setViewportSize({ width: 800, height: 600 })
   await page.goto(BASE_URL)
+
+  // ページ上の情報を取得
+  const repositories = await page.$$eval('article.border', (repoCards) => {
+    return repoCards.map((card) => {
+      const [user, repo] = card.querySelectorAll('h3 a')
+      const formatText = (element) => element && element.innerText.trim()
+
+      return {
+        user: formatText(user),
+        repo: formatText(repo),
+        url: repo.href,
+      }
+    })
+  })
+  const logger = fs.createWriteStream('scrapedData.json', { flag: 'w' })
+  logger.write(JSON.stringify(repositories, null, 2))
 
   // ブラウザを閉じる。
   await browser.close()
