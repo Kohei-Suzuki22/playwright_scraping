@@ -6,7 +6,11 @@
   "author": "kohei <bhkbb0551@gmail.com>",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "scraper": "node scraper.ts"
+  },
   "dependencies": {
+    "@types/node": "^18.11.18",
     "playwright": "^1.29.1",
     "prettier": "^2.8.1"
   }
